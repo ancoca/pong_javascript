@@ -1,5 +1,6 @@
 
 var bola = require('./ball');
+var barra = require('./stick');
 var utils = require('./utils');
 var windowWidth=window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var windowHeight=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -10,6 +11,11 @@ window.onload=function(){
     ball.windowWidth = windowWidth;
     ball.windowHeight = windowHeight;
     ball.location(parseInt((ball.windowWidth/2)-(ball.imgBall.width/2)) ,parseInt((ball.windowHeight/2)-(ball.imgBall.height/2)));
+
+    var stick=new barra("stick");
+    stick.windowWidth = windowWidth;
+    stick.windowHeight = windowHeight;
+    stick.location(parseInt(stick.separation) ,parseInt((stick.windowHeight/2)-(stick.imgStick.height/2)));
 
     var controlMovimiento=function(event){
         event.preventDefault();

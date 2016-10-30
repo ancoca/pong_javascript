@@ -35,7 +35,6 @@ Ball.prototype.location = function(x, y) {
 
   this.imgBall.style.top = (Math.round(y)) + "px";
   this.imgBall.style.left = (Math.round(x)) + "px";
-  console.log("HOLA");
 };
 
 Ball.prototype.move = function() {
@@ -56,6 +55,7 @@ module.exports = Ball;
 },{}],2:[function(require,module,exports){
 
 var bola = require('./ball');
+var barra = require('./stick');
 var utils = require('./utils');
 var windowWidth=window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 var windowHeight=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -66,6 +66,11 @@ window.onload=function(){
     ball.windowWidth = windowWidth;
     ball.windowHeight = windowHeight;
     ball.location(parseInt((ball.windowWidth/2)-(ball.imgBall.width/2)) ,parseInt((ball.windowHeight/2)-(ball.imgBall.height/2)));
+
+    var stick=new barra("stick");
+    stick.windowWidth = windowWidth;
+    stick.windowHeight = windowHeight;
+    stick.location(parseInt(stick.separation) ,parseInt((stick.windowHeight/2)-(stick.imgStick.height/2)));
 
     var controlMovimiento=function(event){
         event.preventDefault();
@@ -98,7 +103,38 @@ window.onload=function(){
 
 };
 
-},{"./ball":1,"./utils":3}],3:[function(require,module,exports){
+},{"./ball":1,"./stick":3,"./utils":4}],3:[function(require,module,exports){
+
+function Stick(id_stick, side) {
+  this.imgStick = document.getElementById(id_stick);
+  this.side= side || "left";
+  this.separation=50;
+  var self = this;
+
+  window.addEventListener("mousemove",
+    function(e){
+      y= (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+      self.location(self.separation,y);
+  },false);
+
+	//Draw stick on screen using coordinates
+	this.location = function(x,y){
+    if (y <= 0) {
+      y = 0;
+    }
+
+    if (y >= this.windowHeight-this.imgStick.height) {
+      y = this.windowHeight-this.imgStick.height;
+    }
+
+    this.imgStick.style.top = (Math.round(y)) + "px";
+    this.imgStick.style.left = (Math.round(x)) + "px";
+	};
+}
+
+module.exports = Stick;
+
+},{}],4:[function(require,module,exports){
 
 function clearSelection() {
      if(document.selection && document.selection.empty) {

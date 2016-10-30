@@ -34,7 +34,6 @@ Ball.prototype.location = function(x, y) {
 
   this.imgBall.style.top = (Math.round(y)) + "px";
   this.imgBall.style.left = (Math.round(x)) + "px";
-  console.log("HOLA");
 };
 
 Ball.prototype.move = function() {
