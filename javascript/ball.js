@@ -1,8 +1,13 @@
 
-function Ball(id_ball) {
+
+var animate = undefined;
+var subject = require('./observer/Subject');
+
+function Ball(id_ball, context) {
     this.imgBall = document.getElementById(id_ball);
     this.control = "Stop";
     this.speed = 1;
+    this.context = context;
     var self = this;
     this.getBallSelf = function(){return self;};
 
@@ -16,7 +21,10 @@ function Ball(id_ball) {
       SOUTH_WEST:{posX:-1,posY:1},
       NORTH_WEST:{posX:-1,posY:-1},
     };
+
 }
+
+Ball.prototype = new subject();
 
 Ball.prototype.setDirection = function(CARDINAL_POINT){
     this.posX = this.directions[CARDINAL_POINT].posX;
@@ -24,16 +32,18 @@ Ball.prototype.setDirection = function(CARDINAL_POINT){
 };
 
 Ball.prototype.location = function(x, y) {
-  if (y <= 0 || y >= this.windowHeight-this.imgBall.height) {
+  if (y <= 0 || y >= this.context.windowHeight-this.imgBall.height) {
     this.posY = this.posY*(-1);
   }
 
-  if(x <= 0 || x >= this.windowWidth-this.imgBall.width) {
+  if(x <= 0 || x >= this.context.windowWidth-this.imgBall.width) {
     this.posX = this.posX*(-1);
   }
 
   this.imgBall.style.top = (Math.round(y)) + "px";
   this.imgBall.style.left = (Math.round(x)) + "px";
+
+  this.Notify(this);
 };
 
 Ball.prototype.move = function() {
@@ -49,4 +59,7 @@ Ball.prototype.stop = function() {
   clearTimeout(animate);
 };
 
+Ball.prototype.getLocation = function() {
+  return {x:parseInt(this.imgBall.style.left),y:parseInt(this.imgBall.style.top)};
+}
 module.exports = Ball;
