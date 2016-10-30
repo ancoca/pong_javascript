@@ -1,21 +1,31 @@
 
 var withObserver = require('./observer/Observer');
 
-function Stick(id_stick, side, context) {
+function Stick(id_stick, side, context, autopilot) {
   this.imgStick = document.getElementById(id_stick);
   this.side= side || "left";
   this.context = context;
   this.separation=50;
+  this.autopilot = autopilot || false;
   var self = this;
+
+
+  if (this.side=="left") {
+    this.imgStick.style.left=this.separation+'px'
+  } else {
+    this.imgStick.style.left=this.context.windowWidth-this.imgStick.width-this.separation;
+  }
 
   withObserver.call(Stick.prototype);
   this.context.ball.AddObserver(this);
 
-  window.addEventListener("mousemove",
-    function(e){
-      y= (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-      self.location(self.separation,y);
-  },false);
+  if (!this.autopilot) {
+    window.addEventListener("mousemove",
+      function(e){
+        y= (window.Event) ? e.pageY : event.clientY + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+        self.location(self.separation,y);
+    },false);
+  }
 
 	//Draw stick on screen using coordinates
 	this.location = function(x,y){
@@ -38,6 +48,10 @@ function Stick(id_stick, side, context) {
     var ballCloseStickLeft = (this.side=="left" && ballPosition.x<=stickPosition.x+this.imgStick.width);
     var ballCloseStickRight = (this.side=="right" && ballPosition.x+ball.imgBall.width>=stickPosition.x);
 
+    if (autopilot) {
+      this.location(parseInt(this.imgStick.style.left) ,ballPosition.y);
+    }
+
     if (  ballCloseStickLeft || ballCloseStickRight) {
 
         var distance=Math.abs((stickPosition.y+this.imgStick.height/2)-(ballPosition.y+ball.imgBall.height/2));
@@ -49,7 +63,6 @@ function Stick(id_stick, side, context) {
               this.context.stop();
               alert("Game OVER");
               this.context.ball.location(parseInt((this.context.windowWidth/2)-(this.context.ball.imgBall.width/2)) ,parseInt((this.context.windowHeight/2)-(this.context.ball.imgBall.height/2)));
-              this.location(parseInt(this.separation) ,parseInt((this.context.windowHeight/2)-(this.imgStick.height/2)));
           }
       }
   }
