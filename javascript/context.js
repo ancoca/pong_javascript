@@ -9,12 +9,11 @@ function Context() {
   this.ball.location(parseInt((this.windowWidth/2)-(this.ball.imgBall.width/2)) ,parseInt((this.windowHeight/2)-(this.ball.imgBall.height/2)));
   this.ball.setDirection("SOUTH_EAST");
 
-  this.stick=new barra("stick", "left", this);
+  this.stick=new barra("stick", "left", this, true);
   this.stick.location(parseInt(this.stick.separation) ,parseInt((this.windowHeight/2)-(this.stick.imgStick.height/2)));
 
   this.stick2=new barra("stick2", "right", this, true);
-
-
+  
 }
 
 Context.prototype.start = function(){

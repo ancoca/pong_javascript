@@ -73,4 +73,12 @@ Stick.prototype.getLocation = function() {
   return {x:parseInt(this.imgStick.style.left),y:parseInt(this.imgStick.style.top)};
 }
 
+Stick.prototype.rezise = function() {
+  if (this.side=="left") {
+    this.imgStick.style.left=this.separation+'px'
+  } else {
+    this.imgStick.style.left=this.context.windowWidth-this.imgStick.width-this.separation;
+  }
+}
+
 module.exports = Stick;

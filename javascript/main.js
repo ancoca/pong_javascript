@@ -17,7 +17,13 @@ window.onload=function(){
         }
     };
 
-    window.addEventListener("keypress",startGame,false);
+    utils.checkCookie(function(){  window.addEventListener("keypress",startGame,false);});
+    window.onresize = function(){
+        context.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        context.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        context.stick.rezise();
+        context.stick2.rezise();
+    }
 
 
 

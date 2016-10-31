@@ -77,12 +77,11 @@ function Context() {
   this.ball.location(parseInt((this.windowWidth/2)-(this.ball.imgBall.width/2)) ,parseInt((this.windowHeight/2)-(this.ball.imgBall.height/2)));
   this.ball.setDirection("SOUTH_EAST");
 
-  this.stick=new barra("stick", "left", this);
+  this.stick=new barra("stick", "left", this, true);
   this.stick.location(parseInt(this.stick.separation) ,parseInt((this.windowHeight/2)-(this.stick.imgStick.height/2)));
 
   this.stick2=new barra("stick2", "right", this, true);
-
-
+  
 }
 
 Context.prototype.start = function(){
@@ -117,7 +116,13 @@ window.onload=function(){
         }
     };
 
-    window.addEventListener("keypress",startGame,false);
+    utils.checkCookie(function(){  window.addEventListener("keypress",startGame,false);});
+    window.onresize = function(){
+        context.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        context.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        context.stick.rezise();
+        context.stick2.rezise();
+    }
 
 
 
@@ -423,6 +428,14 @@ Stick.prototype.getLocation = function() {
   return {x:parseInt(this.imgStick.style.left),y:parseInt(this.imgStick.style.top)};
 }
 
+Stick.prototype.rezise = function() {
+  if (this.side=="left") {
+    this.imgStick.style.left=this.separation+'px'
+  } else {
+    this.imgStick.style.left=this.context.windowWidth-this.imgStick.width-this.separation;
+  }
+}
+
 module.exports = Stick;
 
 },{"./observer/Observer":5}],9:[function(require,module,exports){
@@ -436,6 +449,143 @@ function clearSelection() {
      }
  }
 
+function setCookie(cname, cvalue, exdays) {
+    if (cvalue && cvalue!== ""){
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function showPlayerProfile(){
+  var user = getCookie("username");
+  if (user && user!==""){
+    var nicknameElement=document.getElementById("playerLeft");
+    nicknameElement.innerHTML= user;
+    var dataImage = localStorage.getItem('imgData');
+    if (dataImage){
+      var profileImg=document.createElement("img");
+      profileImg.src = "data:image/png;base64," + dataImage;
+      profileImg.width=48;
+      profileImg.height=64;
+      nicknameElement.parentNode.insertBefore(profileImg,nicknameElement);
+    }
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function checkCookie(addGameKeyBindings) {
+
+    var user = getCookie("username");
+    if (user !== "") {
+        showPlayerProfile();
+        addGameKeyBindings();
+    } else {
+        // Get the modal
+        var modal = document.getElementById('myModal');
+        document.getElementById('blah').style.display="none";
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function() {
+            if (showPlayerProfile()){
+              modal.style.display = "none";
+              addGameKeyBindings();
+            }
+        };
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            if (showPlayerProfile()){
+              modal.style.display = "none";
+              addGameKeyBindings();
+            }
+          }
+        };
+        modal.style.display = "block";
+
+        var nickname = document.getElementById("nickname_");
+        nickname.addEventListener("change",function(){setCookie("username", nickname.value, 365);});
+        nickname.addEventListener("blur",function(){setCookie("username", nickname.value, 365);});
+        nickname.addEventListener("focus",function(){setCookie("username", nickname.value, 365);});
+
+        var imgProfile = document.getElementById("imgProfile");
+        imgProfile.addEventListener("change",function(){readURL(this);});
+    }
+    document.getElementById("playerRight").innerHTML= "Computer";
+}
+
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    var MAX_WIDTH = 48;
+    var MAX_HEIGHT = 64;
+    var width = img.width;
+    var height = img.height;
+
+    if (width > height) {
+      if (width > MAX_WIDTH) {
+        height *= MAX_WIDTH / width;
+        width = MAX_WIDTH;
+      }
+    } else {
+      if (height > MAX_HEIGHT) {
+        width *= MAX_HEIGHT / height;
+        height = MAX_HEIGHT;
+      }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, width, height);
+
+    var dataURL = canvas.toDataURL("image/jpg");
+
+    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+
+function save(){
+  var bannerImage = document.getElementById('blah');
+  var imgData = getBase64Image(bannerImage);
+  localStorage.setItem("imgData", imgData);
+}
+
+function readURL(input) {
+  if (input.files && input.files[0]) {
+      document.getElementById('blah').style.display="block";
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("blah").src=e.target.result;
+          //$('#blah').attr('src', e.target.result);
+          save();
+      };
+      reader.readAsDataURL(input.files[0]);
+  }
+}
+
  module.exports.clearSelection = clearSelection;
+ module.exports.checkCookie = checkCookie;
 
 },{}]},{},[3])
